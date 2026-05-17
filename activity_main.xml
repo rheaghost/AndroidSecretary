@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#121212">
+
+    <LinearLayout
+        android:id="@+id/metrics_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical"
+        android:background="#1E1E1E"
+        android:paddingBottom="5dp">
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="40dp" android:gravity="center_vertical" android:padding="5dp">
+            <View android:id="@+id/status_dot" android:layout_width="10dp" android:layout_height="10dp" android:background="@drawable/status_circle" android:layout_margin="5dp"/>
+            <TextView android:id="@+id/txt_batt" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="BATT:--" android:textColor="#00FF41" android:textSize="10sp" android:layout_marginEnd="8dp"/>
+            <TextView android:id="@+id/txt_tps" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0.0s" android:textColor="#00FF41" android:textSize="10sp" android:layout_marginEnd="5dp"/>
+            <TextView android:id="@+id/txt_vram" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="VRAM:--" android:textColor="#00FF41" android:textSize="10sp" android:layout_marginEnd="8dp"/>
+            <TextView android:id="@+id/txt_status" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="STABLE" android:textColor="#00FF41" android:textSize="10sp" />
+            <Button android:id="@+id/btn_mode" android:layout_width="60dp" android:layout_height="30dp" android:text="SEC" android:textSize="8sp" android:backgroundTint="#444444" />
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="45dp" android:gravity="center_vertical" android:paddingStart="10dp" android:background="#1A1A1A">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="MODEL:" android:textColor="#00FF41" android:textSize="10sp"/>
+            <Spinner android:id="@+id/spinner_model" android:layout_width="match_parent" android:layout_height="wrap_content" android:backgroundTint="#00FF41" />
+        </LinearLayout>
+
+        <!--  Now inside fragment:target setting radio buttons: btn_pc,btn_pi5,btn_runpod,btn_toggle_settings 2601212335
+        <LinearLayout android:layout_width="match_parent" android:layout_height="40dp" android:padding="4dp">
+            <Button android:id="@+id/btn_pc" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="PC" android:textSize="8sp" android:backgroundTint="#222222"/>
+            <Button android:id="@+id/btn_pi5" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="PI5" android:textSize="8sp" android:backgroundTint="#222222" android:layout_marginStart="2dp"/>
+            <Button android:id="@+id/btn_runpod" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="CLOUD" android:textSize="8sp" android:backgroundTint="#222222" android:layout_marginStart="2dp"/>
+            <ImageButton android:id="@+id/btn_toggle_settings" android:layout_width="40dp" android:layout_height="match_parent" android:src="@android:drawable/ic_menu_manage" android:backgroundTint="#333333" app:tint="#00FF41" android:layout_marginStart="4dp"/>
+        </LinearLayout>
+        -->
+
+
+        <LinearLayout android:id="@+id/search_area" android:layout_width="match_parent" android:layout_height="50dp" android:gravity="center_vertical" android:padding="5dp" android:background="#161616" android:visibility="gone">
+            <EditText android:id="@+id/edit_search" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:hint="Search history..." android:textColor="#00FF41" android:textColorHint="#004411" android:background="@null" android:textSize="14sp" />
+            <ImageButton android:id="@+id/btn_search" android:layout_width="45dp" android:layout_height="45dp" android:src="@android:drawable/ic_menu_search" android:background="?attr/selectableItemBackgroundBorderless" app:tint="#00FF41" />
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="5dp">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="PITCH" android:textColor="#00FF41" android:textSize="10sp" />
+            <SeekBar android:id="@+id/pitch_slider" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="200" android:progress="100" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="2dp">
+
+            <TextView android:id="@+id/txt_total_time"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="TOTAL: 0.0s"
+                android:textColor="#00FF41"
+                android:textSize="10sp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/metrics_bar"
+        android:background="#1E1E1E"
+        app:tabTextColor="#004411"
+        app:tabSelectedTextColor="#00FF41" />
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/metrics_bar"
+        android:layout_above="@id/input_area"
+        />
+
+    <LinearLayout
+        android:id="@+id/input_area"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#1E1E1E"
+        android:padding="4dp"
+        android:layout_alignParentBottom="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageButton android:id="@+id/btn_mic"
+                android:layout_width="45dp" android:layout_height="45dp"
+                android:src="@android:drawable/ic_btn_speak_now"
+                android:background="@null" app:tint="#00FF41"/>
+
+            <EditText android:id="@+id/edit_msg"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="#00FF00"
+                android:background="#121212"
+                android:padding="12dp"
+                android:hint="Type message..."
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="2dp">
+
+            <Button android:id="@+id/btn_send"
+                android:layout_width="0dp" android:layout_height="match_parent"
+                android:layout_weight="1" android:text="RUN"
+                android:backgroundTint="#004411" android:textSize="12sp"/>
+
+            <Button android:id="@+id/btn_stop"
+                android:layout_width="0dp" android:layout_height="match_parent"
+                android:layout_weight="1" android:text="STOP"
+                android:backgroundTint="#440000" android:textSize="12sp"
+                android:layout_marginStart="4dp"/>
+
+            <ImageButton android:id="@+id/btn_clear"
+                android:layout_width="45dp" android:layout_height="match_parent"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                android:background="@null" app:tint="#FF0000" />
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</RelativeLayout>
+
