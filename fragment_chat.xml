@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0D0D0D">
+
+    <TextView
+        android:id="@+id/chat_history_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="12dp"
+        android:textColor="#00FF41"
+        android:scrollbars="vertical"
+        android:fadeScrollbars="false"
+        android:gravity="bottom"
+        android:textSize="14sp" />
+
+    <ImageButton
+        android:id="@+id/btn_scroll_down"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_margin="16dp"
+        android:src="@android:drawable/arrow_down_float"
+        android:backgroundTint="#222222"
+        app:tint="#00FF41"
+        android:visibility="gone"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true" />
+
+</RelativeLayout>
