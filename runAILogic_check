@@ -1,0 +1,199 @@
+//runAILogic new
+    private void runAILogic(String userPrompt) {
+        // 1. Record Start Time for TPS calculation
+        long startTime = System.currentTimeMillis();  //position OK 2601172226
+        //for runpod and pi 5  2601162338
+
+        /*
+        replaced to /api/chat 2606081009
+        String targetUrl = currentTargetIp.startsWith("http") ?
+                currentTargetIp + "/api/generate" :
+                "http://" + currentTargetIp + ":11434/api/generate";
+        */
+
+        //save log of user prompt or spoken text here 2606131942
+        // 1. When the user clicks the Send Button (or Voice input fires):
+        //String userPrompt = chatInput.getText().toString();
+        appendTextToFile("USER (" + this.activeAvatar + ")", userPrompt); //2606111945
+
+
+        //new targetUrl of /api/chat 2606081009
+        /*
+        String targetUrl = currentTargetIp.startsWith("http") ?
+                currentTargetIp + "/api/chat" :
+                "http://" + currentTargetIp + ":11434/api/chat";
+                */
+
+        String targetUrl = currentTargetIp.startsWith("http") ?
+                currentTargetIp + "/api/generate" :
+                "http://" + currentTargetIp + ":11434/api/generate";
+
+        //2606121514
+        android.util.Log.i("ENGINE_ROUTE", "🚀 Outbound network payload routed to: " + targetUrl);
+
+        // 2. Prepare visual feedback
+        View dot = findViewById(R.id.status_dot);
+        Animation blink = AnimationUtils.loadAnimation(this, R.anim.blink);
+        runOnUiThread(() -> {
+            dot.startAnimation(blink);
+            statusDisp.setText("STATUS: THINKING...");
+        });
+        // 3. is the old json string before incorporating avatar persone 2606090911
+
+        // 3. Construct JSON with the current selected model
+        /*
+        String json = "{" +
+                "\"model\": \"" + selectedModel + "\"," +
+                "\"prompt\": \"" + userPrompt.replace("\"", "\\\"") + "\"," +
+                "\"stream\": false" +
+                "}";
+        */
+        // 1. Fallback security in case no fragment selection occurred yet
+        if (this.systemPrompt == null || this.systemPrompt.isEmpty()) {
+            this.systemPrompt = "You are a helpful AI assistant.";
+        }
+
+        // 2. Build the messages array payload matching Ollama's Chat API schema
+        // This is the new json string using the escapeJson function
+        String json = "{\n" +
+                "  \"model\": \"" + selectedModel + "\",\n" + // Your dynamic model string
+                "  \"messages\": [\n" +
+                "    { \"role\": \"system\", \"content\": \"" + escapeJson(this.systemPrompt) + "\" },\n" +
+                "    { \"role\": \"user\", \"content\": \"" + escapeJson(userPrompt) + "\" }\n" +
+                "  ],\n" +
+                "  \"stream\": false\n" +
+                "}";
+
+
+
+        RequestBody body = RequestBody.create(json, MediaType.get("application/json; charset=utf-8"));
+        /*
+        Request request = new Request.Builder()
+                //.url("http://192.168.0.7:11434/api/generate") // Ensure IP is correct
+                .url(targetUrl)
+                .post(body)
+                .build();
+
+         *///old request 2601172339
+
+
+        // Inside runAILogic:
+        String final_url;
+        if(isRunPodMode) {
+            String targetUrl_runpod = buildFinalUrl();
+            final_url=targetUrl_runpod;
+
+        }
+        else
+        {
+            //replaced to /api/chat 2606081013
+            //final_url=currentBaseUrl + "/api/generate";
+            final_url=currentBaseUrl + "/api/chat";
+
+        }
+
+
+            Request request = new Request.Builder()
+                    .url(final_url)  //.url(currentBaseUrl + "/api/generate") // No more hard-coded IPs!  readjust for runpod mode 2601182032
+                    .post(body)
+                    .build();  //new request 2601172340
+
+
+
+        currentCall = client.newCall(request);
+        currentCall.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(() -> {
+                    dot.clearAnimation();
+                    statusDisp.setText(call.isCanceled() ? "STATUS: STOPPED" : "STATUS: OFFLINE");
+                });
+            }
+
+           @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                // 1. GUARANTEE SOCKET CLOSURE VIA TRY-WITH-RESOURCES [2026-06-12]
+                try (Response autoCloseResponse = response) {
+
+                    if (!autoCloseResponse.isSuccessful()) {
+                        runOnUiThread(() -> {
+                            statusDisp.setText("STATUS: SERVER ERROR " + autoCloseResponse.code());
+                            dot.clearAnimation();
+                            response.close(); // MUST CLOSE HERE!  2606131016
+                        });
+                        return;
+                    }
+
+                    final String rawJson = autoCloseResponse.body().string();
+                    long endTime = System.currentTimeMillis();
+                    final double duration = (endTime - startTime) / 1000.0;
+                    double totalDuration = duration;
+
+                    try {
+                        JSONObject jsonObject = new JSONObject(rawJson);
+                        final String cleanReply;
+
+                        // 2. ENDPOINT AGNOSTIC PARSER: Handle both /api/chat and /api/generate patterns automatically
+                        if (jsonObject.has("message")) {
+                            // Structured Chat Pattern
+                            JSONObject messageObj = jsonObject.getJSONObject("message");
+                            cleanReply = messageObj.getString("content");
+                        } else if (jsonObject.has("response")) {
+                            // Flat Generation Pattern
+                            cleanReply = jsonObject.getString("response");
+                        } else {
+                            throw new JSONException("Unable to find valid AI payload keys in response object.");
+                        }
+
+                        // 3. SECURE WORKER LOGGING
+                        String personaTag = MainActivity.this.activeAvatar;
+                        appendTextToFile(personaTag + " [Model: " + selectedModel + "]", cleanReply);
+
+                        // --- SERVER LOAD CALCULATION ---
+                        long evalCount = jsonObject.optLong("eval_count", 0);
+                        long evalDuration = jsonObject.optLong("eval_duration", 1);
+                        double tps = (evalCount > 0 && evalDuration > 0) ? (evalCount / (evalDuration / 1_000_000_000.0)) : 0.0;
+
+                        // 4. SAFE UI EXECUTION LOOP
+                        runOnUiThread(() -> {
+                            TextView tpsDisp = findViewById(R.id.txt_tps);
+                            tpsDisp.setText(String.format("TPS: %.2f", tps));
+
+                            TextView txtTotal = findViewById(R.id.txt_total_time);
+                            txtTotal.setText(String.format("TOTAL: %.1fs", totalDuration));
+
+                            if (tps > 15) tpsDisp.setTextColor(GREEN);
+                            else if (tps > 5) tpsDisp.setTextColor(Color.YELLOW);
+                            else tpsDisp.setTextColor(Color.RED);
+
+                            String time = getCurrentTime();
+                            if (chatHistoryView != null) {
+                                chatHistoryView.append("\n[" + time + "] Me: " + userPrompt);
+                                chatHistoryView.append("\n[" + time + "] " + selectedModel.toUpperCase() + ": " + cleanReply + "\n");
+                                scrollToBottom();
+                            }
+
+                            saveToDatabase(userPrompt, cleanReply, selectedModel, duration);
+
+                            if (tts != null) {
+                                tts.speak(cleanReply, TextToSpeech.QUEUE_FLUSH, null, "ID_" + System.currentTimeMillis());
+                            }
+
+                            dot.clearAnimation();
+                            statusDisp.setText("STATUS: STABLE");
+                        });
+
+                    } catch (JSONException e) {
+                        android.util.Log.e("AI_ENGINE", "❌ Structural Parsing Error: " + e.getMessage());
+                        runOnUiThread(() -> {
+                            statusDisp.setText("STATUS: DATA ERROR");
+                            dot.clearAnimation(); // Stop infinite spin on error
+                        });
+                    }
+                } // <-- autoCloseResponse closes natively right here. Zero leaks possible.
+            }
+        });
+    }
+
+
+    //runAILogic new
