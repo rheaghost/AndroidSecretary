@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_margin="5dp"
+    android:padding="10dp"
+    android:background="#121212">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="REMOTE DESTINATION"
+        android:textColor="#00FF41"
+        android:textSize="12sp"
+        android:textStyle="bold"/>
+
+    <RadioGroup
+        android:id="@+id/target_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <RadioButton android:id="@+id/radio_pc" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="PC" android:textColor="#00FF41" />
+        <RadioButton android:id="@+id/radio_pi" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Pi5" android:textColor="#00FF41" />
+        <RadioButton android:id="@+id/rb_host_termux" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Local Termux " android:textColor="#00FF41" android:checked="false"/>
+        <RadioButton android:id="@+id/rb_offline_hotspot" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Offline Hotspot (Outdoors)" android:textColor="#00FF41" />
+        <RadioButton android:id="@+id/radio_pod" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="RunPod" android:textColor="#00FF41" />
+    </RadioGroup>
+
+    <EditText
+        android:id="@+id/edit_custom_ip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter IP or Proxy ID"
+        android:textColor="#00FF41"
+        android:textColorHint="#004411"
+        android:background="@android:drawable/edit_text" />
+    <EditText
+        android:id="@+id/edit_port"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter custom port"
+        android:textColor="#00FF41"
+        android:textColorHint="#004411"
+        android:background="@android:drawable/edit_text" />
+    <Button
+        android:id="@+id/btn_save_custom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#004411"
+        android:textColor="#00FF41"
+        android:text="SAVE CUSTOM ADDRESS" />
+    <Button
+        android:id="@+id/btn_wipe_db"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Wipe DB"
+        android:textColor="#00FF41"
+        android:textColorHint="#004411"
+        />
+    <Button
+        android:id="@+id/btn_manual_export"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="EXPORT TO DOWNLOADS"
+        android:backgroundTint="#004411"
+        android:layout_marginTop="8dp" />
+
+</LinearLayout>
+
